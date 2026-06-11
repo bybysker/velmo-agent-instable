@@ -18,7 +18,7 @@ class Settings:
 def load_settings() -> Settings:
     """Lit les variables d'environnement et renvoie les paramètres du service."""
     return Settings(
-        endpoint=os.environ["AZURE_AI_ENDPOINT"],
+        endpoint=os.environ["AZURE_AI_INFERENCE_ENDPOINT"],
         api_key=os.environ["AZURE_AI_INFERENCE_API_KEY"],
         model=os.environ.get("AZURE_AI_INFERENCE_MODEL", "Kimi-K2.6"),
     )

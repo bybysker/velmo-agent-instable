@@ -20,4 +20,4 @@ IN_SCOPE_TOPICS = {
 def is_in_scope(text: str) -> bool:
     """Renvoie True si le message relève bien du support commandes/livraisons Velmo."""
     lowered = text.lower()
-    return any(topic in lowered for topic in lowered.split())
+    return any(topic in lowered for topic in IN_SCOPE_TOPICS)
