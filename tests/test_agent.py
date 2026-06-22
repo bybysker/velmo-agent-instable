@@ -15,6 +15,16 @@ def test_agent_keeps_conversation_context(make_scripted):
     assert "4521" in flat
 
 
+def test_agent_routes_refund_to_after_sales(make_scripted):
+    llm = make_scripted("Demande après-vente enregistrée.")
+    agent = VelmoAgent(llm=llm)
+
+    reply = agent.handle("Je veux un remboursement pour la commande 4490.")
+
+    # Nouveau besoin métier : remboursement -> parcours après-vente unifié.
+    assert reply.category == "after_sales"
+
+
 def test_agent_refuses_out_of_scope(make_scripted):
     llm = make_scripted("Voici une recette de cookies...")
     agent = VelmoAgent(llm=llm)

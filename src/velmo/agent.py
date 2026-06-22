@@ -14,6 +14,7 @@ _CATEGORY_BY_INTENT = {
     Intent.GREETING: "greeting",
     Intent.ORDER_STATUS: "order_status",
     Intent.DELIVERY: "delivery",
+    Intent.AFTER_SALES: "after_sales",
     Intent.RETURN: "after_sales",
     Intent.REFUND: "after_sales",
 }
@@ -55,6 +56,6 @@ class VelmoAgent:
         self.memory.record("assistant", answer)
         return AgentReply(
             message=answer,
-            category=_CATEGORY_BY_INTENT.get(intent, "greeting"),
+            category=_CATEGORY_BY_INTENT.get(intent.AFTER_SALES, "greeting"),
             within_scope=True,
         )
