@@ -16,6 +16,7 @@ class Intent(str, Enum):
     RETURN = "return"
     REFUND = "refund"
     AFTER_SALES = "after_sales"   #ajouté pour regrouper les intentions de retour et de remboursement
+    UNKNOWN = "unknown"           # aucune intention reconnue (fallback explicite)
 
 
 # Intentions par ordre de priorité métier : la première dont un mot-clé
@@ -42,7 +43,7 @@ def classify(text: str) -> Intent:
     for intent, keywords in _PRIORITY:  
         if any(keyword in lowered for keyword in keywords): # adaptation pour regrouper les intentions de retour et de remboursement sous after_sales
             return intent
-    return Intent.GREETING
+    return Intent.UNKNOWN
 
 
 def route(intent: Intent) -> str:
