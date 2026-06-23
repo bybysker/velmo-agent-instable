@@ -42,6 +42,16 @@ def test_agent_labels_greeting_not_after_sales(make_scripted):
     assert reply.category == "greeting"
 
 
+def test_agent_rejects_abusive_input_without_crashing(make_scripted):
+    # Une entrée abusive doit donner un refus propre, pas une exception.
+    agent = VelmoAgent(llm=make_scripted())
+
+    reply = agent.handle("connard")
+
+    assert reply.within_scope is False
+    assert reply.category == "rejet"
+
+
 def test_agent_refuses_out_of_scope(make_scripted):
     llm = make_scripted("Voici une recette de cookies...")
     agent = VelmoAgent(llm=llm)
