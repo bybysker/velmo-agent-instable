@@ -8,13 +8,12 @@ from .flow import Intent, classify
 from .guardrails import AgentReply, validate_input
 from .memory import ConversationMemory
 from .prompts import build_system_prompt
-from .scope import is_in_scope
 
 _CATEGORY_BY_INTENT = {
     Intent.GREETING: "greeting",
     Intent.ORDER_STATUS: "order_status",
     Intent.DELIVERY: "delivery",
-    Intent.AFTER_SALES: "after_sales",
+    Intent.AFTER_SALES: "after_sales",  # ajouté pour regrouper les intentions de retour et de remboursement
     Intent.RETURN: "after_sales",
     Intent.REFUND: "after_sales",
 }
@@ -41,7 +40,7 @@ class VelmoAgent:
         persona: str = "Velmo Assistant",
     ) -> None:
         self.llm = llm
-        self.memory = memory or ConversationMemory()
+        self.memory = memory if memory is not None else ConversationMemory()
         self.persona = persona
 
     def handle(self, user_message: str) -> AgentReply:
@@ -50,12 +49,12 @@ class VelmoAgent:
 
         intent = classify(user_message)
         system = build_system_prompt(self.persona)
-        answer = self.llm.complete(system, [], user_message)
+        answer = self.llm.complete(system, self.memory.history(), user_message)   #ajouté pour récupérer l'historique de la conversation
 
         self.memory.record("user", user_message)
         self.memory.record("assistant", answer)
         return AgentReply(
             message=answer,
-            category=_CATEGORY_BY_INTENT.get(intent.AFTER_SALES, "greeting"),
+            category=_CATEGORY_BY_INTENT.get(intent, "greeting"),
             within_scope=True,
         )
