@@ -13,7 +13,7 @@ def main() -> None:
     agent = VelmoAgent(llm=get_llm())
     print("Assistant Velmo prêt. Posez votre question (Ctrl+C pour quitter).")
     while True:
-        try:
+        try:                                         
             user_input = input("\nVous : ").strip()
             if not user_input:
                 continue

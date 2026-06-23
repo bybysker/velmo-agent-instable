@@ -11,6 +11,6 @@ DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 def load_problem_conversations(path: Path | None = None) -> list[dict]:
     """Charge le jeu de conversations problématiques fourni."""
     #path = path or DATA_DIR / "conversations.json"
-    path = path or DATA_DIR / "conversations_problematiques.json"
+    path = path or DATA_DIR / "conversations_problematiques.json" #ajouté pour charger le jeu de conversations problématiques
         
     return json.loads(path.read_text(encoding="utf-8"))

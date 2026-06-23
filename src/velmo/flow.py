@@ -15,12 +15,12 @@ class Intent(str, Enum):
     DELIVERY = "delivery"
     RETURN = "return"
     REFUND = "refund"
-    AFTER_SALES = "after_sales"
+    AFTER_SALES = "after_sales"   #ajouté pour regrouper les intentions de retour et de remboursement
 
 
 # Intentions par ordre de priorité métier : la première dont un mot-clé
 # apparaît dans le message l'emporte (after_sales prime sur order_status).
-_PRIORITY: list[tuple[Intent, list[str]]] = [
+_PRIORITY: list[tuple[Intent, list[str]]] = [ 
     (Intent.AFTER_SALES, ["retour", "renvoyer", "remboursement", "rembourser"]),
     (Intent.DELIVERY, ["livraison", "colis", "où est"]),
     (Intent.ORDER_STATUS, ["commande", "statut"]),
@@ -39,8 +39,8 @@ _ROUTES: dict[Intent, str] = {
 def classify(text: str) -> Intent:
     """Devine l'intention métier en testant les intentions par ordre de priorité."""
     lowered = text.lower()
-    for intent, keywords in _PRIORITY:
-        if any(keyword in lowered for keyword in keywords):
+    for intent, keywords in _PRIORITY:  
+        if any(keyword in lowered for keyword in keywords): # adaptation pour regrouper les intentions de retour et de remboursement sous after_sales
             return intent
     return Intent.GREETING
 
