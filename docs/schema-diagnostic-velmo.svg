@@ -1,0 +1,94 @@
+<svg viewBox="0 0 880 560" xmlns="http://www.w3.org/2000/svg" font-family="'Comic Sans MS','Segoe Print',cursive">
+  <rect x="0" y="0" width="880" height="560" fill="#ffffff"/>
+  <text x="30" y="34" font-size="18" font-weight="bold" fill="#333333">Agent Velmo - flux + memoire + garde-fous (diagnostic)</text>
+
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#333333"/>
+    </marker>
+  </defs>
+
+  <!-- styles via groups: fills -->
+  <!-- ROW 1 -->
+  <g>
+    <rect x="30" y="70" width="150" height="60" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+    <text x="105" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Message client</text>
+    <text x="105" y="116" text-anchor="middle" font-size="11" fill="#666666">entree</text>
+
+    <rect x="240" y="70" width="150" height="60" rx="10" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5"/>
+    <text x="250" y="86" font-size="10" font-weight="bold" fill="#9a7d0a">ROLE</text>
+    <text x="315" y="102" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Garde-fou entree</text>
+    <text x="315" y="120" text-anchor="middle" font-size="11" fill="#666666">validate_input</text>
+
+    <rect x="450" y="70" width="150" height="60" rx="10" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5"/>
+    <text x="460" y="86" font-size="10" font-weight="bold" fill="#9a7d0a">ROLE</text>
+    <text x="525" y="102" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Perimetre</text>
+    <text x="525" y="120" text-anchor="middle" font-size="11" fill="#666666">is_in_scope</text>
+
+    <rect x="660" y="70" width="150" height="60" rx="10" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+    <text x="670" y="86" font-size="10" font-weight="bold" fill="#4a7a3a">FLUX</text>
+    <text x="735" y="102" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Intention</text>
+    <text x="735" y="120" text-anchor="middle" font-size="11" fill="#666666">classify</text>
+  </g>
+
+  <!-- ROW 2 -->
+  <g>
+    <rect x="660" y="250" width="150" height="60" rx="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+    <text x="670" y="266" font-size="10" font-weight="bold" fill="#3b5b86">MEMOIRE</text>
+    <text x="735" y="282" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Memoire</text>
+    <text x="735" y="300" text-anchor="middle" font-size="11" fill="#666666">history()</text>
+
+    <rect x="450" y="250" width="150" height="60" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+    <text x="525" y="276" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Modele Azure</text>
+    <text x="525" y="294" text-anchor="middle" font-size="11" fill="#666666">Kimi-K2.6</text>
+
+    <rect x="240" y="250" width="150" height="60" rx="10" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5"/>
+    <text x="250" y="266" font-size="10" font-weight="bold" fill="#9a7d0a">ROLE</text>
+    <text x="315" y="282" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Garde-fou sortie</text>
+    <text x="315" y="300" text-anchor="middle" font-size="11" fill="#666666">AgentReply</text>
+
+    <rect x="30" y="250" width="150" height="60" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+    <text x="105" y="276" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Reponse</text>
+    <text x="105" y="294" text-anchor="middle" font-size="11" fill="#666666">+ refus</text>
+  </g>
+
+  <!-- flows -->
+  <g stroke="#333333" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M180 100 H240"/>
+    <path d="M390 100 H450"/>
+    <path d="M600 100 H660"/>
+    <path d="M735 130 V190 H840 V280 H810"/>
+    <path d="M660 280 H600"/>
+    <path d="M450 280 H390"/>
+    <path d="M240 280 H180"/>
+  </g>
+
+  <!-- memory store -->
+  <g>
+    <ellipse cx="735" cy="380" rx="65" ry="13" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+    <path d="M670 380 V425 a65 13 0 0 0 130 0 V380" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+    <ellipse cx="735" cy="380" rx="65" ry="13" fill="none" stroke="#6c8ebf" stroke-width="1.5"/>
+    <text x="735" y="406" text-anchor="middle" font-size="12" font-weight="bold" fill="#333333">ConversationMemory</text>
+  </g>
+  <g stroke="#333333" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M710 310 V367"/>
+    <path d="M765 367 V314"/>
+  </g>
+  <text x="660" y="345" text-anchor="end" font-size="11" fill="#666666">record()</text>
+  <text x="775" y="345" font-size="11" fill="#666666">history()</text>
+
+  <!-- defects -->
+  <g>
+    <circle cx="388" cy="76" r="11" fill="#d92d20"/><text x="388" y="81" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">!</text>
+    <circle cx="598" cy="76" r="11" fill="#d92d20"/><text x="598" y="81" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">!</text>
+    <circle cx="808" cy="256" r="11" fill="#d92d20"/><text x="808" y="261" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">!</text>
+    <circle cx="388" cy="256" r="11" fill="#d92d20"/><text x="388" y="261" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">!</text>
+  </g>
+
+  <!-- legend -->
+  <circle cx="42" cy="500" r="9" fill="#d92d20"/><text x="42" y="504" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff">!</text>
+  <text x="58" y="504" font-size="11" fill="#666666">= point de defaut</text>
+  <rect x="300" y="492" width="16" height="16" fill="#fff2cc" stroke="#d6b656"/><text x="322" y="504" font-size="11" fill="#666666">role</text>
+  <rect x="380" y="492" width="16" height="16" fill="#dae8fc" stroke="#6c8ebf"/><text x="402" y="504" font-size="11" fill="#666666">memoire</text>
+  <rect x="480" y="492" width="16" height="16" fill="#d5e8d4" stroke="#82b366"/><text x="502" y="504" font-size="11" fill="#666666">flux</text>
+</svg>

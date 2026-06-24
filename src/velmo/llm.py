@@ -1,6 +1,6 @@
 """Client LLM réel adossé à Azure AI Inference (Kimi-K2.6).
 
-L'import du SDK est différé pour que le coeur applicatif (mémoire, garde-fous,
+L'import du SDK est différé pour que le cœur applicatif (mémoire, garde-fous,
 flux) reste testable sans dépendre du SDK ni d'un endpoint joignable.
 """
 

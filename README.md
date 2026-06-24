@@ -62,9 +62,9 @@ make typecheck  # mypy
 make down       # arrête les services docker
 ```
 
-## Known issues
+## État
 
-L'assistant a été remonté à la hâte après une évolution du parcours métier et la suite de tests de référence n'est pas encore au vert. La tenue du contexte sur les conversations longues et le filtrage des demandes hors périmètre demandent encore du soin avant une remise en production.
+Au départ l'assistant avait été remonté à la hâte après une évolution du parcours métier : la suite de tests de référence n'était pas au vert, le contexte se perdait sur les conversations longues et les demandes hors périmètre passaient. J'ai diagnostiqué puis corrigé ces points — le détail de chaque correction est dans `JOURNAL-DES-CHOIX.md`. Aujourd'hui les 21 tests passent et les conversations de référence sont rejouées sans régression.
 
 ## License
 

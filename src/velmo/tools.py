@@ -27,6 +27,7 @@ def lookup_order(order_id: str) -> str:
 
 @register
 def track_delivery(tracking: str) -> str:
+    """Donne l'état de livraison d'un colis Velmo à partir de son numéro de suivi."""
     return f"Colis {tracking} : en transit, livraison estimée demain."
 
 

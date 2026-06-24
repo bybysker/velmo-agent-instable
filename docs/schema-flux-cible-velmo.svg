@@ -1,0 +1,66 @@
+<svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" font-family="'Comic Sans MS','Segoe Print',cursive">
+  <rect x="0" y="0" width="900" height="480" fill="#ffffff"/>
+  <text x="20" y="32" font-size="18" font-weight="bold" fill="#333333">Question 2 - Flux cible : regrouper retour + remboursement en after-sales</text>
+
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#333333"/>
+    </marker>
+  </defs>
+
+  <!-- divider -->
+  <line x1="445" y1="55" x2="445" y2="430" stroke="#cccccc" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <!-- ============ AVANT ============ -->
+  <text x="20" y="72" font-size="14" font-weight="bold" fill="#b85450">AVANT  -  2 parcours separes</text>
+
+  <rect x="30" y="95" width="130" height="46" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+  <text x="95" y="123" text-anchor="middle" font-size="12" fill="#333333">"retour"</text>
+  <rect x="230" y="95" width="160" height="46" rx="10" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+  <text x="310" y="116" text-anchor="middle" font-size="12" font-weight="bold" fill="#333333">Intent.RETURN</text>
+  <text x="310" y="132" text-anchor="middle" font-size="10" fill="#666666">parcours retour</text>
+  <path d="M160 118 H230" stroke="#333333" stroke-width="2" fill="none" marker-end="url(#a)"/>
+
+  <rect x="30" y="175" width="130" height="46" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+  <text x="95" y="203" text-anchor="middle" font-size="11" fill="#333333">"remboursement"</text>
+  <rect x="230" y="175" width="160" height="46" rx="10" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+  <text x="310" y="196" text-anchor="middle" font-size="12" font-weight="bold" fill="#333333">Intent.REFUND</text>
+  <text x="310" y="212" text-anchor="middle" font-size="10" fill="#666666">parcours remboursement</text>
+  <path d="M160 198 H230" stroke="#333333" stroke-width="2" fill="none" marker-end="url(#a)"/>
+
+  <text x="30" y="270" font-size="12" font-style="italic" fill="#b85450">=&gt; 2 intentions distinctes</text>
+
+  <!-- middle big arrow -->
+  <path d="M400 320 H490" stroke="#9673a6" stroke-width="4" fill="none" marker-end="url(#a)"/>
+  <text x="445" y="310" text-anchor="middle" font-size="12" font-weight="bold" fill="#5b3f73">on regroupe</text>
+
+  <!-- ============ APRES ============ -->
+  <text x="470" y="72" font-size="14" font-weight="bold" fill="#4a7a3a">APRES  -  1 parcours after-sales</text>
+
+  <rect x="470" y="90" width="120" height="38" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+  <text x="530" y="114" text-anchor="middle" font-size="11" fill="#333333">"retour"</text>
+  <rect x="470" y="138" width="120" height="38" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+  <text x="530" y="162" text-anchor="middle" font-size="11" fill="#333333">"renvoi"</text>
+  <rect x="470" y="186" width="120" height="38" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+  <text x="530" y="210" text-anchor="middle" font-size="10" fill="#333333">"remboursement"</text>
+
+  <rect x="660" y="120" width="190" height="56" rx="10" fill="#d5e8d4" stroke="#82b366" stroke-width="2.5"/>
+  <text x="755" y="144" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Intent.AFTER_SALES</text>
+  <text x="755" y="162" text-anchor="middle" font-size="10" fill="#666666">une seule intention</text>
+
+  <!-- converging arrows -->
+  <path d="M590 109 H630 V145 H660" stroke="#333333" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M590 157 H660" stroke="#333333" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M590 205 H630 V165 H660" stroke="#333333" stroke-width="2" fill="none" marker-end="url(#a)"/>
+
+  <rect x="660" y="230" width="190" height="44" rx="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+  <text x="755" y="257" text-anchor="middle" font-size="12" font-weight="bold" fill="#333333">open_after_sales</text>
+  <path d="M755 176 V230" stroke="#333333" stroke-width="2" fill="none" marker-end="url(#a)"/>
+
+  <text x="470" y="300" font-size="12" font-style="italic" fill="#4a7a3a">=&gt; 1 seule intention, 1 seul outil</text>
+
+  <!-- bottom note -->
+  <rect x="30" y="370" width="820" height="60" rx="10" fill="#fff7e6" stroke="#d6b656" stroke-width="1.5"/>
+  <text x="50" y="395" font-size="12" font-weight="bold" fill="#9a7d0a">Ce qui NE change PAS (non-regression) :</text>
+  <text x="50" y="416" font-size="12" fill="#333333">les parcours accueil, statut de commande et suivi de colis doivent continuer a marcher exactement comme avant.</text>
+</svg>
