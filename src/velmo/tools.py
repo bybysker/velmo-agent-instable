@@ -27,6 +27,7 @@ def lookup_order(order_id: str) -> str:
 
 @register
 def track_delivery(tracking: str) -> str:
+    """Suit l'acheminement d'un colis à partir de son numéro de suivi."""
     return f"Colis {tracking} : en transit, livraison estimée demain."
 
 

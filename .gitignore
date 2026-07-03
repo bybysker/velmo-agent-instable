@@ -45,3 +45,7 @@ out/
 *.sqlite
 *.db
 chroma-data/
+
+docs/archives/
+
+CLAUDE.md

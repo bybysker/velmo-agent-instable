@@ -14,8 +14,7 @@ _CATEGORY_BY_INTENT = {
     Intent.GREETING: "greeting",
     Intent.ORDER_STATUS: "order_status",
     Intent.DELIVERY: "delivery",
-    Intent.RETURN: "after_sales",
-    Intent.REFUND: "after_sales",
+    Intent.AFTER_SALES: "after_sales",
 }
 
 REFUSAL_MESSAGE = (
@@ -47,9 +46,16 @@ class VelmoAgent:
         """Traite un message utilisateur et renvoie une réponse structurée."""
         validate_input(user_message)
 
+        if not is_in_scope(user_message):
+            return AgentReply(
+                message=REFUSAL_MESSAGE,
+                category="refusal",
+                within_scope=False,
+            )
+
         intent = classify(user_message)
         system = build_system_prompt(self.persona)
-        answer = self.llm.complete(system, [], user_message)
+        answer = self.llm.complete(system, self.memory.history(), user_message)
 
         self.memory.record("user", user_message)
         self.memory.record("assistant", answer)

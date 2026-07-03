@@ -13,8 +13,7 @@ class Intent(str, Enum):
     GREETING = "greeting"
     ORDER_STATUS = "order_status"
     DELIVERY = "delivery"
-    RETURN = "return"
-    REFUND = "refund"
+    AFTER_SALES = "after_sales"
 
 
 # Mots-clés -> libellé d'intention (taxonomie métier courante).
@@ -37,8 +36,7 @@ _ROUTES: dict[Intent, str] = {
     Intent.GREETING: "greet",
     Intent.ORDER_STATUS: "lookup_order",
     Intent.DELIVERY: "track_delivery",
-    Intent.RETURN: "open_after_sales",
-    Intent.REFUND: "open_after_sales",
+    Intent.AFTER_SALES: "open_after_sales",
 }
 
 
