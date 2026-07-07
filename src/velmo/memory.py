@@ -12,6 +12,7 @@ class ConversationMemory:
     """Fenêtre glissante sur les tours de conversation.
 
     `window` borne le nombre de tours réinjectés dans le prompt du modèle.
+    Les tours les plus récents sont toujours conservés.
     """
 
     window: int = 8
@@ -22,8 +23,11 @@ class ConversationMemory:
         self._turns.append((role, content))
 
     def history(self) -> list[Turn]:
-        """Renvoie les tours à réinjecter dans le prompt (bornés par `window`)."""
-        return self._turns[: self.window]
+        """Renvoie les tours les plus récents à réinjecter dans le prompt (bornés par `window`)."""
+        # BUG CORRIGÉ : on prend les N derniers tours, pas les N premiers.
+        # Avant : self._turns[: self.window]  → gardait les plus ANCIENS
+        # Après : self._turns[-self.window :]  → garde les plus RÉCENTS
+        return self._turns[-self.window :]
 
     def clear(self) -> None:
         self._turns.clear()

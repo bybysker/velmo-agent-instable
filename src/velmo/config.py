@@ -16,7 +16,11 @@ class Settings:
 
 
 def load_settings() -> Settings:
-    """Lit les variables d'environnement et renvoie les paramètres du service."""
+    """Lit les variables d'environnement et renvoie les paramètres du service.
+
+    BUG CORRIGÉ : la variable endpoint était lue depuis AZURE_AI_ENDPOINT
+    mais la convention du SDK et les tests utilisent AZURE_AI_INFERENCE_ENDPOINT.
+    """
     return Settings(
         endpoint=os.environ["AZURE_AI_INFERENCE_ENDPOINT"],
         api_key=os.environ["AZURE_AI_INFERENCE_API_KEY"],

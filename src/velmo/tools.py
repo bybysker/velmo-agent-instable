@@ -27,6 +27,11 @@ def lookup_order(order_id: str) -> str:
 
 @register
 def track_delivery(tracking: str) -> str:
+    """Suit l'acheminement d'un colis Velmo à partir de son numéro de suivi.
+
+    BUG CORRIGÉ : la docstring manquante empêchait l'enregistrement de cet outil
+    dans le registre TOOLS. Il n'était donc jamais exposé au modèle.
+    """
     return f"Colis {tracking} : en transit, livraison estimée demain."
 
 

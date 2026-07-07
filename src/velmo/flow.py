@@ -1,7 +1,8 @@
 """Classification d'intention et routage vers le bon outil métier.
 
-Le périmètre métier a évolué : les demandes de retour et de remboursement
-sont désormais regroupées sous un même parcours « après-vente » (after_sales).
+Évolution métier : les demandes de retour et de remboursement sont désormais
+regroupées sous un même parcours « après-vente » représenté par Intent.AFTER_SALES.
+Les anciennes valeurs RETURN et REFUND sont supprimées.
 """
 
 from __future__ import annotations
@@ -13,8 +14,8 @@ class Intent(str, Enum):
     GREETING = "greeting"
     ORDER_STATUS = "order_status"
     DELIVERY = "delivery"
-    RETURN = "return"
-    REFUND = "refund"
+    # BUG CORRIGÉ : RETURN et REFUND fusionnés en AFTER_SALES (nouveau parcours métier)
+    AFTER_SALES = "after_sales"
 
 
 # Mots-clés -> libellé d'intention (taxonomie métier courante).
@@ -37,8 +38,7 @@ _ROUTES: dict[Intent, str] = {
     Intent.GREETING: "greet",
     Intent.ORDER_STATUS: "lookup_order",
     Intent.DELIVERY: "track_delivery",
-    Intent.RETURN: "open_after_sales",
-    Intent.REFUND: "open_after_sales",
+    Intent.AFTER_SALES: "open_after_sales",
 }
 
 

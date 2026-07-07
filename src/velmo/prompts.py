@@ -11,5 +11,10 @@ SYSTEM_PROMPT = (
 
 
 def build_system_prompt(persona: str = "Velmo Assistant") -> str:
-    """Assemble le prompt système pour la persona donnée."""
-    return SYSTEM_PROMPT.format(role=persona)
+    """Assemble le prompt système pour la persona donnée.
+
+    BUG CORRIGÉ : l'ancienne implémentation appelait SYSTEM_PROMPT.format(role=persona)
+    alors que la chaîne contient le placeholder {persona} (pas {role}).
+    La persona n'était donc jamais injectée dans le prompt.
+    """
+    return SYSTEM_PROMPT.format(persona=persona)
