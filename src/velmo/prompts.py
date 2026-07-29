@@ -12,4 +12,4 @@ SYSTEM_PROMPT = (
 
 def build_system_prompt(persona: str = "Velmo Assistant") -> str:
     """Assemble le prompt système pour la persona donnée."""
-    return SYSTEM_PROMPT.format(role=persona)
+    return SYSTEM_PROMPT.format(persona=persona)

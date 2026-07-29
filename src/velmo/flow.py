@@ -15,40 +15,35 @@ class Intent(str, Enum):
     DELIVERY = "delivery"
     RETURN = "return"
     REFUND = "refund"
+    AFTER_SALES = "after_sales"   #ajouté pour regrouper les intentions de retour et de remboursement
+    UNKNOWN = "unknown"           # aucune intention reconnue (fallback explicite)
 
 
-# Mots-clés -> libellé d'intention (taxonomie métier courante).
-_KEYWORDS: dict[str, str] = {
-    "bonjour": "greeting",
-    "salut": "greeting",
-    "commande": "order_status",
-    "statut": "order_status",
-    "livraison": "delivery",
-    "colis": "delivery",
-    "où est": "delivery",
-    "retour": "after_sales",
-    "renvoyer": "after_sales",
-    "remboursement": "after_sales",
-    "rembourser": "after_sales",
-}
+# Intentions par ordre de priorité métier : la première dont un mot-clé
+# apparaît dans le message l'emporte (after_sales prime sur order_status).
+_PRIORITY: list[tuple[Intent, list[str]]] = [ 
+    (Intent.AFTER_SALES, ["retour", "renvoyer", "remboursement", "rembourser"]),
+    (Intent.DELIVERY, ["livraison", "colis", "où est"]),
+    (Intent.ORDER_STATUS, ["commande", "statut"]),
+    (Intent.GREETING, ["bonjour", "salut"]),
+]
 
 # Intention -> nom de l'outil à invoquer.
 _ROUTES: dict[Intent, str] = {
     Intent.GREETING: "greet",
     Intent.ORDER_STATUS: "lookup_order",
     Intent.DELIVERY: "track_delivery",
-    Intent.RETURN: "open_after_sales",
-    Intent.REFUND: "open_after_sales",
+    Intent.AFTER_SALES: "open_after_sales",
 }
 
 
 def classify(text: str) -> Intent:
-    """Devine l'intention métier d'un message à partir de mots-clés."""
+    """Devine l'intention métier en testant les intentions par ordre de priorité."""
     lowered = text.lower()
-    for keyword, label in _KEYWORDS.items():
-        if keyword in lowered:
-            return Intent(label)
-    return Intent.GREETING
+    for intent, keywords in _PRIORITY:  
+        if any(keyword in lowered for keyword in keywords): # adaptation pour regrouper les intentions de retour et de remboursement sous after_sales
+            return intent
+    return Intent.UNKNOWN
 
 
 def route(intent: Intent) -> str:

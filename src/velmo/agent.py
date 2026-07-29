@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from .flow import Intent, classify
-from .guardrails import AgentReply, validate_input
+from .guardrails import AgentReply, GuardrailError, validate_input
 from .memory import ConversationMemory
 from .prompts import build_system_prompt
 from .scope import is_in_scope
@@ -14,6 +14,7 @@ _CATEGORY_BY_INTENT = {
     Intent.GREETING: "greeting",
     Intent.ORDER_STATUS: "order_status",
     Intent.DELIVERY: "delivery",
+    Intent.AFTER_SALES: "after_sales",  # ajouté pour regrouper les intentions de retour et de remboursement
     Intent.RETURN: "after_sales",
     Intent.REFUND: "after_sales",
 }
@@ -40,16 +41,30 @@ class VelmoAgent:
         persona: str = "Velmo Assistant",
     ) -> None:
         self.llm = llm
-        self.memory = memory or ConversationMemory()
+        self.memory = memory if memory is not None else ConversationMemory() # modifer pour utiliser la mémoire injectée si fournie, sinon créer une nouvelle instance
         self.persona = persona
 
     def handle(self, user_message: str) -> AgentReply:
         """Traite un message utilisateur et renvoie une réponse structurée."""
-        validate_input(user_message)
+        try:
+            validate_input(user_message)
+        except GuardrailError:
+            return AgentReply(
+                message="Merci de rester courtois : je ne peux pas traiter ce message.",
+                category="rejet",
+                within_scope=False,
+            )
 
         intent = classify(user_message)
+        if intent is Intent.UNKNOWN and not is_in_scope(user_message):
+            return AgentReply(
+                message=REFUSAL_MESSAGE,
+                category="refusal",
+                within_scope=False,
+            )
+
         system = build_system_prompt(self.persona)
-        answer = self.llm.complete(system, [], user_message)
+        answer = self.llm.complete(system, self.memory.history(), user_message)   #ajouté pour récupérer l'historique de la conversation
 
         self.memory.record("user", user_message)
         self.memory.record("assistant", answer)

@@ -23,7 +23,7 @@ class ConversationMemory:
 
     def history(self) -> list[Turn]:
         """Renvoie les tours à réinjecter dans le prompt (bornés par `window`)."""
-        return self._turns[: self.window]
+        return self._turns[-self.window :]
 
     def clear(self) -> None:
         self._turns.clear()

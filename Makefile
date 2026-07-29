@@ -10,7 +10,7 @@ down:
 	docker compose down
 
 chat:
-	uv run python -m velmo.chat
+	docker compose exec agent uv run python -m velmo.chat
 
 test:
 	uv run pytest -v
