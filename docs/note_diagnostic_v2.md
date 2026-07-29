@@ -23,11 +23,23 @@ Chaque conversation problématique de `data/conversations_problematiques.json` a
 Le périmètre se partage en **deux familles de défauts indépendantes**, plus un
 écart de flux métier traité à part.
 
-| Famille | Nature du défaut | Où ça se joue | Cas concernés |
-|---|---|---|---|
-| **A. Mémoire** | Le contexte des tours précédents n'est pas transmis au modèle | Mémoire ↔ appel modèle | `ctx-oubli-1` |
-| **B. Rôle (garde-fous)** | Les entrées hors-périmètre / abusives ne sont pas filtrées proprement | Garde-fous entrée + contrôle de périmètre | `perimetre-1`, `perimetre-2`, `entree-abusive-1` |
-| **C. Flux métier** *(connexe)* | Le routage ne correspond pas au nouveau parcours après-vente | Classification d'intention | `apres-vente-1` |
+```text
++--------------------------+-------------------------------+--------------------------------+--------------------------------+
+| Famille                  | Nature du défaut              | Où ça se joue                  | Cas concernés                  |
++==========================+===============================+================================+================================+
+| A. MÉMOIRE               | Le contexte des tours         | Mémoire <-> appel modèle       | `ctx-oubli-1`                  |
+|                          | précédents n'est pas transmis |                                |                                |
+|                          | au modèle                     |                                |                                |
++--------------------------+-------------------------------+--------------------------------+--------------------------------+
+| B. RÔLE (GARDE-FOUS)     | Les entrées hors-périmètre /  | Garde-fous entrée + contrôle   | `perimetre-1`, `perimetre-2`,  |
+|                          | abusives ne sont pas filtrées | de périmètre                   | `entree-abusive-1`             |
+|                          | proprement                    |                                |                                |
++--------------------------+-------------------------------+--------------------------------+--------------------------------+
+| C. FLUX MÉTIER (connexe) | Le routage ne correspond pas  | Classification d'intention     | `apres-vente-1`                |
+|                          | au nouveau parcours après-    |                                |                                |
+|                          | vente                         |                                |                                |
++--------------------------+-------------------------------+--------------------------------+--------------------------------+
+```
 
 > **Distinction clé.** Un **défaut de mémoire** = problème de *transmission du
 > contexte* (l'agent *pourrait* bien répondre, mais on ne lui donne pas
@@ -43,11 +55,18 @@ Le périmètre se partage en **deux familles de défauts indépendantes**, plus 
 
 Conversation `ctx-oubli-1` rejouée :
 
-| Tour | Message client | Réponse de l'agent | Mémoire ? |
-|---|---|---|---|
-| 1 | « ma commande **4521** est en retard » | accuse réception, demande l'e-mail | — |
-| 2 | « et la précédente, la **4490** ? » | répond sur la 4490, **aucun lien** avec la 4521 | ❌ |
-| 3 | « finalement, ma première commande, la **4521**, est arrivée ? » | répond **comme s'il découvrait** la 4521 ; a oublié le « en retard » du tour 1 | ❌ |
+```text
++------+----------------------------------------------------+----------------------------------------------------+-----------+
+| Tour | Message client                                     | Réponse de l'agent                                 | Mémoire ? |
++======+====================================================+====================================================+===========+
+| 1    | "ma commande 4521 est en retard"                   | accuse réception, demande l'e-mail                 | -         |
++------+----------------------------------------------------+----------------------------------------------------+-----------+
+| 2    | "et la précédente, la 4490 ?"                      | répond sur la 4490, AUCUN LIEN avec la 4521        | [KO]      |
++------+----------------------------------------------------+----------------------------------------------------+-----------+
+| 3    | "finalement, ma première commande, la 4521, est    | répond COMME S'IL DÉCOUVRAIT la 4521 ; a oublié le | [KO]      |
+|      | arrivée ?"                                         | "en retard" du tour 1                              |           |
++------+----------------------------------------------------+----------------------------------------------------+-----------+
+```
 
 **Symptôme caractérisé :** l'agent est **sans état (stateless)** du point de vue
 du modèle. Chaque message est traité **isolément** ; aucune information des tours
@@ -60,10 +79,18 @@ Le composant mémoire **existe** (`ConversationMemory`, `memory.py`) et il est
 même alimenté. Le défaut n'est donc pas l'absence de mémoire, mais son
 **câblage** :
 
-| Réf | Défaut | Mécanisme | Localisation |
-|---|---|---|---|
-| **M1** | Mémoire **jamais relue** | La conversation est *écrite* (`record`) mais on passe une liste vide `[]` au modèle au lieu de `self.memory.history()` → le modèle ne voit jamais l'historique | `agent.py:52` |
-| **M2** | Fenêtre glissante **inversée** | `history()` renvoie `self._turns[:window]` (les tours les plus **anciens**) au lieu de `self._turns[-window:]` (les plus **récents**) | `memory.py:26` |
+```text
++-----+----------------------------+------------------------------------------------------------------------+----------------+
+| Réf | Défaut                     | Mécanisme                                                              | Localisation   |
++=====+============================+========================================================================+================+
+| M1  | Mémoire JAMAIS RELUE       | La conversation est écrite (`record`) mais on passe une liste vide     | `agent.py:52`  |
+|     |                            | `[]` au modèle au lieu de `self.memory.history()` -> le modèle ne voit |                |
+|     |                            | jamais l'historique                                                    |                |
++-----+----------------------------+------------------------------------------------------------------------+----------------+
+| M2  | Fenêtre glissante INVERSÉE | `history()` renvoie `self._turns[:window]` (les tours les plus         | `memory.py:26` |
+|     |                            | ANCIENS) au lieu de `self._turns[-window:]` (les plus RÉCENTS)         |                |
++-----+----------------------------+------------------------------------------------------------------------+----------------+
+```
 
 > Image : on prend des notes après chaque échange (`record`), mais on **ne rouvre
 > jamais le carnet** au moment de répondre (`[]`). M1 est la cause active de
@@ -76,11 +103,19 @@ même alimenté. Le défaut n'est donc pas l'absence de mémoire, mais son
 
 ### 3.1 Sorties de rôle observées
 
-| Cas | Entrée client | Comportement attendu | Comportement observé |
-|---|---|---|---|
-| `perimetre-1` | « recette de cookies ? » | refus poli (hors support) | refuse — **mais via le prompt seul**, pas un garde-fou |
-| `perimetre-2` | « quel placement boursier ? » | refus (hors rôle) | refuse — **idem, non garanti** |
-| `entree-abusive-1` | « imbécile » | rejet propre par le garde-fou | **l'application plante** (exception non gérée) |
+```text
++--------------------+-----------------------------+-------------------------------+-----------------------------------------+
+| Cas                | Entrée client               | Comportement attendu          | Comportement observé                    |
++====================+=============================+===============================+=========================================+
+| `perimetre-1`      | "recette de cookies ?"      | refus poli (hors support)     | refuse - MAIS VIA LE PROMPT SEUL, pas   |
+|                    |                             |                               | un garde-fou                            |
++--------------------+-----------------------------+-------------------------------+-----------------------------------------+
+| `perimetre-2`      | "quel placement boursier ?" | refus (hors rôle)             | refuse - IDEM, NON GARANTI              |
++--------------------+-----------------------------+-------------------------------+-----------------------------------------+
+| `entree-abusive-1` | "imbécile"                  | rejet propre par le garde-fou | L'APPLICATION PLANTE (exception non     |
+|                    |                             |                               | gérée)                                  |
++--------------------+-----------------------------+-------------------------------+-----------------------------------------+
+```
 
 **Symptôme caractérisé :** le maintien dans le rôle n'est **pas contrôlé par le
 code**. Pour le hors-sujet, le refus dépend du bon vouloir du modèle face au
@@ -89,11 +124,25 @@ déclenche* mais provoque un **crash** au lieu d'un refus courtois.
 
 ### 3.2 Mécanisme de garde-fous manquant / défaillant
 
-| Réf | Défaut | Mécanisme | Localisation |
-|---|---|---|---|
-| **R1** | Contrôle de périmètre **non branché** | `is_in_scope` est importé mais jamais appelé dans `handle()` ; `within_scope=True` est codé en dur (le champ « ment ») | `agent.py:51-59` |
-| **R2** | `is_in_scope` **défaillante** | La fonction bouclait sur les mots du message au lieu de `IN_SCOPE_TOPICS` → renvoyait toujours `True` *(corrigé en cours de diagnostic)* | `scope.py:23` |
-| **R3** | Garde-fou abusif **non rattrapé** | `validate_input` lève `GuardrailError`, mais aucun `try/except` ne l'intercepte (ni `handle`, ni la boucle chat qui ne gère que `KeyboardInterrupt`) → crash | `agent.py:48` + `chat.py:16-23` |
+```text
++-----+-----------------------------------+------------------------------------------------+---------------------------------+
+| Réf | Défaut                            | Mécanisme                                      | Localisation                    |
++=====+===================================+================================================+=================================+
+| R1  | Contrôle de périmètre NON BRANCHÉ | `is_in_scope` est importé mais jamais appelé   | `agent.py:51-59`                |
+|     |                                   | dans `handle()` ; `within_scope=True` est codé |                                 |
+|     |                                   | en dur (le champ "ment")                       |                                 |
++-----+-----------------------------------+------------------------------------------------+---------------------------------+
+| R2  | `is_in_scope` DÉFAILLANTE         | La fonction bouclait sur les mots du message   | `scope.py:23`                   |
+|     |                                   | au lieu de `IN_SCOPE_TOPICS` -> renvoyait      |                                 |
+|     |                                   | toujours `True` (corrigé en cours de           |                                 |
+|     |                                   | diagnostic)                                    |                                 |
++-----+-----------------------------------+------------------------------------------------+---------------------------------+
+| R3  | Garde-fou abusif NON RATTRAPÉ     | `validate_input` lève `GuardrailError`, mais   | `agent.py:48` + `chat.py:16-23` |
+|     |                                   | aucun `try/except` ne l'intercepte (ni         |                                 |
+|     |                                   | `handle`, ni la boucle chat qui ne gère que    |                                 |
+|     |                                   | `KeyboardInterrupt`) -> crash                  |                                 |
++-----+-----------------------------------+------------------------------------------------+---------------------------------+
+```
 
 > Le refus du hors-sujet ne doit pas reposer **uniquement** sur le prompt : il
 > faut un garde-fou déterministe (R1 + R2). Et un garde-fou qui se déclenche doit
@@ -107,11 +156,21 @@ Hors dichotomie mémoire/rôle, mais relevé car bloquant. Le métier a unifié
 **retour + remboursement** en un parcours **après-vente**. L'implémentation est
 incohérente :
 
-| Réf | Défaut | Mécanisme | Localisation |
-|---|---|---|---|
-| **F1** | Refactor **incomplet** | `_KEYWORDS` mappe vers `"after_sales"`, mais l'enum `Intent` n'a pas de membre `AFTER_SALES` → `Intent("after_sales")` lève `ValueError` (crash sur « je veux un remboursement ») | `flow.py:12-17` vs `29-32` |
-| **F2** | Mots-clés **premier-match** | « commande » testé avant « remboursement » → « remboursement pour la commande 4490 » mal classé en `order_status` | `flow.py:21-51` |
-| **F3** | Routage **non câblé** | `handle()` appelle `classify()` mais jamais `route()` ni les outils ; aucun outil métier n'est réellement invoqué | `agent.py:46-60` |
+```text
++-----+-------------------------+---------------------------------------------------------------+----------------------------+
+| Réf | Défaut                  | Mécanisme                                                     | Localisation               |
++=====+=========================+===============================================================+============================+
+| F1  | Refactor INCOMPLET      | `_KEYWORDS` mappe vers `"after_sales"`, mais l'enum `Intent`  | `flow.py:12-17` vs `29-32` |
+|     |                         | n'a pas de membre `AFTER_SALES` -> `Intent("after_sales")`    |                            |
+|     |                         | lève `ValueError` (crash sur "je veux un remboursement")      |                            |
++-----+-------------------------+---------------------------------------------------------------+----------------------------+
+| F2  | Mots-clés PREMIER-MATCH | "commande" testé avant "remboursement" -> "remboursement pour | `flow.py:21-51`            |
+|     |                         | la commande 4490" mal classé en `order_status`                |                            |
++-----+-------------------------+---------------------------------------------------------------+----------------------------+
+| F3  | Routage NON CÂBLÉ       | `handle()` appelle `classify()` mais jamais `route()` ni les  | `agent.py:46-60`           |
+|     |                         | outils ; aucun outil métier n'est réellement invoqué          |                            |
++-----+-------------------------+---------------------------------------------------------------+----------------------------+
+```
 
 ---
 
@@ -149,40 +208,46 @@ flowchart TD
 
 ### Version ASCII (secours)
 
-```
-Client ──message──> [chat.py] (try/except = KeyboardInterrupt seulement)
-                        │
-                        ▼
+```text
+Client --message--> [chat.py] (try/except = KeyboardInterrupt seulement)
+                        |
+                        v
                  [agent.handle]
-                        │
-   GARDE-FOUS ──► validate_input  ── abus détecté ✅ / exception non rattrapée ⛔R3
-                        │
-   FLUX ─────────► classify  ── Intent("after_sales") => crash ⛔F1 / 1er mot-clé gagne ⛔F2
-                        │
-   GARDE-FOUS ──► is_in_scope  ── jamais appelé ⛔R1 / logique réparée ✅R2
-                        │
+                        |
+   GARDE-FOUS --> validate_input  -- abus détecté [OK] / exception non rattrapée [!]R3
+                        |
+   FLUX ---------> classify  -- Intent("after_sales") => crash [!]F1 / 1er mot-clé gagne [!]F2
+                        |
+   GARDE-FOUS --> is_in_scope  -- jamais appelé [!]R1 / logique réparée [OK]R2
+                        |
                   build_system_prompt(persona)
-                        │
-                        ▼
-              llm.complete(system, [], user)  ── historique = []  ⛔M1
-                        │
-   MÉMOIRE ────► record() écrit ✅   |   history() => _turns[:window] ⛔M2
-                        │                (… jamais relue par le LLM)
-                        ▼
-              AgentReply(within_scope=True en dur ⛔R1)  ──► Client
+                        |
+                        v
+              llm.complete(system, [], user)  -- historique = []  [!]M1
+                        |
+   MÉMOIRE ----> record() écrit [OK]   |   history() => _turns[:window] [!]M2
+                        |                (... jamais relue par le LLM)
+                        v
+              AgentReply(within_scope=True en dur [!]R1)  --> Client
 
-   route() + tools.py  ── JAMAIS INVOQUÉS ⛔F3
+   route() + tools.py  -- JAMAIS INVOQUÉS [!]F3
 ```
 
 ---
 
 ## 6. Synthèse — périmètre explicite & cap
 
-| Axe | Critère de performance visé | Défauts |
-|---|---|---|
-| **Mémoire** | Tenir le contexte multi-tours | M1, M2 |
-| **Rôle** | Rester dans son rôle / refuser proprement | R1, R2, R3 |
-| **Flux métier** *(connexe)* | Flux conforme au nouveau besoin | F1, F2, F3 |
+```text
++-----------------------+-------------------------------------------+------------+
+| Axe                   | Critère de performance visé               | Défauts    |
++=======================+===========================================+============+
+| MÉMOIRE               | Tenir le contexte multi-tours             | M1, M2     |
++-----------------------+-------------------------------------------+------------+
+| RÔLE                  | Rester dans son rôle / refuser proprement | R1, R2, R3 |
++-----------------------+-------------------------------------------+------------+
+| FLUX MÉTIER (connexe) | Flux conforme au nouveau besoin           | F1, F2, F3 |
++-----------------------+-------------------------------------------+------------+
+```
 
 **Conclusion.** Le périmètre est **explicitement scindé** : un problème de
 **mémoire** (contexte non transmis) et un problème de **rôle** (garde-fous
@@ -193,7 +258,14 @@ localisation. La correction fera l'objet de l'étape suivante.
 
 ### Annexe — blocages d'amorçage corrigés (pour pouvoir reproduire)
 
-| # | Erreur | Cause | Correctif |
-|---|---|---|---|
-| C1 | `KeyError: 'AZURE_AI_ENDPOINT'` | nom de variable d'env incohérent | `config.py` → `AZURE_AI_INFERENCE_ENDPOINT` |
-| C2 | `KeyError: 'persona'` | placeholder `{persona}` vs `.format(role=...)` | `prompts.py` → `.format(persona=persona)` |
+```text
++----+---------------------------------+------------------------------------------+------------------------------------------+
+| #  | Erreur                          | Cause                                    | Correctif                                |
++====+=================================+==========================================+==========================================+
+| C1 | `KeyError: 'AZURE_AI_ENDPOINT'` | nom de variable d'env incohérent         | `config.py` ->                           |
+|    |                                 |                                          | `AZURE_AI_INFERENCE_ENDPOINT`            |
++----+---------------------------------+------------------------------------------+------------------------------------------+
+| C2 | `KeyError: 'persona'`           | placeholder `{persona}` vs               | `prompts.py` ->                          |
+|    |                                 | `.format(role=...)`                      | `.format(persona=persona)`               |
++----+---------------------------------+------------------------------------------+------------------------------------------+
+```

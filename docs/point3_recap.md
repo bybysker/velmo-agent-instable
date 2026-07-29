@@ -21,13 +21,36 @@ suivants : mémoire & rôle).
 
 ## 3. Ce qui a été fait
 
-| Réf | Défaut (existant) | Correction (cible) | Fichier | Test de verrouillage |
-|-----|-------------------|--------------------|---------|----------------------|
-| **F1** | `Intent("after_sales")` plantait (membre manquant) ; routes basées sur `RETURN`/`REFUND` | Ajout `Intent.AFTER_SALES` ; `_ROUTES` → `open_after_sales` | `flow.py` | `test_route_after_sales_to_tool` |
-| **F2** | « commande » masquait « remboursement » → remboursement classé en `order_status` | Classification par **priorité métier explicite** (`_PRIORITY`, after_sales en tête) | `flow.py` | `test_classify_after_sales_even_with_order_word` *(ajouté)* |
-| **Outil** | `track_delivery` non exposé (docstring manquante → non enregistré) | Ajout d'une docstring | `tools.py` | `test_track_delivery_is_exposed` |
-| **Agent** | `_CATEGORY_BY_INTENT` sans `AFTER_SALES` → remboursement étiqueté `greeting` | Ajout `Intent.AFTER_SALES: "after_sales"` | `agent.py` | `test_agent_routes_refund_to_after_sales` *(ajouté)* |
-| **Harnais** | `regression.py` lisait `conversations.json` (inexistant) | Lecture de `conversations_problematiques.json` | `regression.py` | `test_problem_conversations_load` |
+```text
++---------+-------------------------+-------------------------------------+-----------------+--------------------------------------------------+
+| Réf     | Défaut (existant)       | Correction (cible)                  | Fichier         | Test de verrouillage                             |
++=========+=========================+=====================================+=================+==================================================+
+| F1      | `Intent("after_sales")` | Ajout `Intent.AFTER_SALES` ;        | `flow.py`       | `test_route_after_sales_to_tool`                 |
+|         | plantait (membre        | `_ROUTES` -> `open_after_sales`     |                 |                                                  |
+|         | manquant) ; routes      |                                     |                 |                                                  |
+|         | basées sur              |                                     |                 |                                                  |
+|         | `RETURN`/`REFUND`       |                                     |                 |                                                  |
++---------+-------------------------+-------------------------------------+-----------------+--------------------------------------------------+
+| F2      | "commande" masquait     | Classification par priorité métier  | `flow.py`       | `test_classify_after_sales_even_with_order_word` |
+|         | "remboursement" ->      | explicite (`_PRIORITY`, after_sales |                 | (ajouté)                                         |
+|         | remboursement classé en | en tête)                            |                 |                                                  |
+|         | `order_status`          |                                     |                 |                                                  |
++---------+-------------------------+-------------------------------------+-----------------+--------------------------------------------------+
+| OUTIL   | `track_delivery` non    | Ajout d'une docstring               | `tools.py`      | `test_track_delivery_is_exposed`                 |
+|         | exposé (docstring       |                                     |                 |                                                  |
+|         | manquante -> non        |                                     |                 |                                                  |
+|         | enregistré)             |                                     |                 |                                                  |
++---------+-------------------------+-------------------------------------+-----------------+--------------------------------------------------+
+| AGENT   | `_CATEGORY_BY_INTENT`   | Ajout `Intent.AFTER_SALES:          | `agent.py`      | `test_agent_routes_refund_to_after_sales`        |
+|         | sans `AFTER_SALES` ->   | "after_sales"`                      |                 | (ajouté)                                         |
+|         | remboursement étiqueté  |                                     |                 |                                                  |
+|         | `greeting`              |                                     |                 |                                                  |
++---------+-------------------------+-------------------------------------+-----------------+--------------------------------------------------+
+| HARNAIS | `regression.py` lisait  | Lecture de                          | `regression.py` | `test_problem_conversations_load`                |
+|         | `conversations.json`    | `conversations_problematiques.json` |                 |                                                  |
+|         | (inexistant)            |                                     |                 |                                                  |
++---------+-------------------------+-------------------------------------+-----------------+--------------------------------------------------+
+```
 
 ### Vérification de bout en bout
 
@@ -38,12 +61,19 @@ suivants : mémoire & rôle).
 
 Les 4 tests encore rouges relèvent des **points suivants** :
 
-| Test rouge | Axe | Point |
-|------------|-----|-------|
-| `test_agent_keeps_conversation_context` | Mémoire (M1 : historique non réinjecté) | Point mémoire |
-| `test_agent_refuses_out_of_scope` | Rôle (R1 : scope non branché) | Point rôle |
-| `test_validate_input_rejects_abusive_message` | Rôle (R3 : match exact au lieu de sous-chaîne) | Point rôle |
-| `test_reply_rejects_unknown_category` | Rôle (category non contrainte) | Point rôle |
+```text
++-----------------------------------------------+------------------------------------------------+---------------+
+| Test rouge                                    | Axe                                            | Point         |
++===============================================+================================================+===============+
+| `test_agent_keeps_conversation_context`       | Mémoire (M1 : historique non réinjecté)        | Point mémoire |
++-----------------------------------------------+------------------------------------------------+---------------+
+| `test_agent_refuses_out_of_scope`             | Rôle (R1 : scope non branché)                  | Point rôle    |
++-----------------------------------------------+------------------------------------------------+---------------+
+| `test_validate_input_rejects_abusive_message` | Rôle (R3 : match exact au lieu de sous-chaîne) | Point rôle    |
++-----------------------------------------------+------------------------------------------------+---------------+
+| `test_reply_rejects_unknown_category`         | Rôle (category non contrainte)                 | Point rôle    |
++-----------------------------------------------+------------------------------------------------+---------------+
+```
 
 *Note : `memory.py` (M2, fenêtre glissante) et `scope.py` (R2, logique de scope)
 ont déjà été corrigés en amont mais seront committés avec leurs axes respectifs.*
