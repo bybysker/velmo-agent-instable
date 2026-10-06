@@ -59,12 +59,19 @@ tests/            Suite de tests
 make fmt        # ruff format + autofix
 make lint       # ruff check
 make typecheck  # mypy
+make replay     # rejoue les conversations de référence sur le modèle réel
+make replay-offline  # idem, sans connexion au modèle
 make down       # arrête les services docker
 ```
 
+## Documentation
+
+- `docs/note_de_diagnostic.md` — diagnostic mémoire / rôle, schéma de l'agent, flux cible, plan de non-régression
+- `docs/journal_des_choix.md` — décisions prises et limites connues
+
 ## Known issues
 
-L'assistant a été remonté à la hâte après une évolution du parcours métier et la suite de tests de référence n'est pas encore au vert. La tenue du contexte sur les conversations longues et le filtrage des demandes hors périmètre demandent encore du soin avant une remise en production.
+Les outils métier ne sont pas encore appelés par l'agent : le routage se traduit par la catégorie de réponse. Les filtres d'entrée et de périmètre reposent sur des mots-clés. Voir les limites connues dans `docs/journal_des_choix.md`.
 
 ## License
 
