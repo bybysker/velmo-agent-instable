@@ -1,4 +1,4 @@
-.PHONY: install up down chat test fmt lint typecheck
+.PHONY: install up down chat replay replay-offline test fmt lint typecheck
 
 install:
 	uv sync
@@ -11,6 +11,12 @@ down:
 
 chat:
 	uv run python -m velmo.chat
+
+replay:
+	uv run python -m velmo.regression
+
+replay-offline:
+	uv run python -m velmo.regression --offline
 
 test:
 	uv run pytest -v

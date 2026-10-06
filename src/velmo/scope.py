@@ -2,20 +2,21 @@
 
 from __future__ import annotations
 
+import re
+
+# Racines recherchées en sous-chaîne : « commande » couvre « commandes »,
+# « rembours » couvre « remboursement », « rembourser », « remboursé »…
 IN_SCOPE_TOPICS = {
     "commande",
-    "commandes",
     "livraison",
-    "livraisons",
+    "livré",
     "colis",
+    "suivi",
     "retour",
-    "retours",
-    "remboursement",
-    "remboursements",
-    "facture",
-    "factures",
+    "renvoyer",
+    "rembours",
+    "factur",
     "après-vente",
-    "after_sales",
     "statut",
 }
 
@@ -30,3 +31,22 @@ def is_in_scope(text: str) -> bool:
     """
     lowered = text.lower()
     return any(topic in lowered for topic in IN_SCOPE_TOPICS)
+
+
+def is_follow_up(text: str, history: list[tuple[str, str]]) -> bool:
+    """Renvoie True si un message sans mot-clé métier prolonge une conversation support.
+
+    Exemple : après « ma commande 4521 est en retard », le client écrit
+    « Et la précédente, la 4490, où en est-elle ? ». Aucun mot de
+    IN_SCOPE_TOPICS, mais la demande est légitime dans ce contexte.
+
+    `history` contient les tours (role, content) déjà échangés et acceptés.
+    Attention : une règle trop permissive rouvre la porte aux sorties de rôle
+    (« Et une recette de cookies ? » juste après une question de commande).
+    """
+    # Une relance doit citer un numéro de commande (4 chiffres ou plus) et
+    # prolonger une conversation qui portait déjà sur le support Velmo.
+    # `history` est seulement lu : l'agent transmet ensuite cette même liste au modèle.
+    if not history or not re.search(r"\d{4,}", text):
+        return False
+    return any(is_in_scope(content) for _, content in history)

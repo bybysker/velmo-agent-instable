@@ -15,6 +15,14 @@ BLOCKED_TERMS = {
     "ferme-la",
 }
 
+# Au-delà, un message de support n'est plus plausible (collage massif, injection).
+MAX_INPUT_CHARS = 1000
+
+GUARDRAIL_REFUSAL_MESSAGE = (
+    "Je ne peux pas traiter ce message. Merci de reformuler votre demande "
+    "concernant vos commandes, livraisons ou retours Velmo."
+)
+
 # Catégories de réponse autorisées.
 AllowedCategory = Literal[
     "greeting",
@@ -36,6 +44,10 @@ def validate_input(text: str) -> None:
     stricte), donc seul un message composé uniquement du terme était refusé.
     On utilise maintenant `term in lowered` pour détecter le terme dans une phrase.
     """
+    if not text.strip():
+        raise GuardrailError("Entrée refusée : message vide.")
+    if len(text) > MAX_INPUT_CHARS:
+        raise GuardrailError("Entrée refusée : message trop long.")
     lowered = text.lower()
     for term in BLOCKED_TERMS:
         if term in lowered:

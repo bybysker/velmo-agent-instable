@@ -21,3 +21,14 @@ def test_reply_accepts_known_category():
 def test_reply_rejects_unknown_category():
     with pytest.raises(ValidationError):
         AgentReply(message="ok", category="banane", within_scope=True)
+
+
+@pytest.mark.parametrize("text", ["", "   "])
+def test_validate_input_rejects_empty_message(text):
+    with pytest.raises(GuardrailError):
+        validate_input(text)
+
+
+def test_validate_input_rejects_oversized_message():
+    with pytest.raises(GuardrailError):
+        validate_input("commande " * 200)

@@ -6,13 +6,15 @@ flux) reste testable sans dépendre du SDK ni d'un endpoint joignable.
 
 from __future__ import annotations
 
+from typing import Any
+
 from .config import load_settings
 
 
 class AzureLLM:
     """Adapte le modèle de chat Azure à l'interface `LLMClient` de l'agent."""
 
-    def __init__(self, model) -> None:
+    def __init__(self, model: Any) -> None:
         self._model = model
 
     def complete(self, system: str, history: list[tuple[str, str]], user: str) -> str:
@@ -20,12 +22,14 @@ class AzureLLM:
         for role, content in history:
             messages.append({"role": role, "content": content})
         messages.append({"role": "user", "content": user})
-        return self._model.invoke(messages).content
+        return str(self._model.invoke(messages).content)
 
 
 def get_llm() -> AzureLLM:
     """Construit le client Azure AI Inference à partir de l'environnement."""
-    from langchain_azure_ai.chat_models import AzureAIOpenAIApiChatModel
+    from langchain_azure_ai.chat_models import (  # type: ignore[import-untyped]
+        AzureAIOpenAIApiChatModel,
+    )
 
     settings = load_settings()
     model = AzureAIOpenAIApiChatModel(

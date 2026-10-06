@@ -5,6 +5,7 @@ from __future__ import annotations
 from dotenv import load_dotenv
 
 from .agent import VelmoAgent
+from .guardrails import GUARDRAIL_REFUSAL_MESSAGE, GuardrailError
 from .llm import get_llm
 
 
@@ -19,6 +20,9 @@ def main() -> None:
                 continue
             reply = agent.handle(user_input)
             print(f"\nVelmo : {reply.message}")
+        except GuardrailError:
+            # Refus propre : on ne plante pas la session sur une entrée rejetée.
+            print(f"\nVelmo : {GUARDRAIL_REFUSAL_MESSAGE}")
         except KeyboardInterrupt:
             print("\nÀ bientôt !")
             break
